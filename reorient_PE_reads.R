@@ -1,12 +1,11 @@
 #!/usr/bin/env Rscript
-# This R script reorient PE reads according to FW and REV primer sequence. Two files will be generated:
+# This R script reorient 16S/18S amplicons PE reads according to FW and REV primer sequence. Two files will be generated:
 # R1 containing only FW reads, R2 containing only REV reads.
 # The script recognize a barcode sequence of a given length (upstream to primers) and trims variable Ns upstream to barcodes
 # at the beginning of reads retaining only pair that contain at least one full barcode on one side or both. 
 # Read pairs without a primer match at both R1 and R2 (partial primer sequence on both R1/R2),
 # or pairs without at least one complete barcode will be discarded.
-# The script needs fqgrep to be installed
-# https://github.com/indraniel/fqgrep
+# The script needs fqgrep (https://github.com/indraniel/fqgrep) to be installed
 # Rscript commandline Usage
 # >Rscript script.R path_to_R1 path_to_R2 fw_primer rev_primer primer_mismatch output_dir barcode_length nthreads
 #
@@ -31,15 +30,6 @@ errQuit <- function(mesg, status=1) {
   message("Error: ", mesg)
   q(status=status)
 }
-
-#R1_path<-"/home/mchialva/trimming_test/R_script_single/test_R1.fastq"
-#R2_path<-"/home/mchialva/trimming_test/R_script_single/test_R2.fastq"
-#fw_primer<-"GAGAGAGAGAGAGAGAG"
-#rev_primer<-"GTGTGTGTGTGTGTGTG"
-#primer_mismatch<-as.integer(4)
-#output_dir<-"/home/mchialva/trimming_test/R_script_multicores/"
-#barcode_length<-as.integer(8)
-#nthreads<-as.integer(20)
 
 ### VALIDATE ARGUMENTS ###
 # Input directory is expected to contain .fastq file(s)
