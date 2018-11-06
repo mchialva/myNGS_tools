@@ -58,6 +58,10 @@ if(suppressWarnings(suppressMessages(!require(dplyr))))
 {install.packages("dplyr", dependencies = T, repos='https://cloud.r-project.org/')
   suppressMessages(require(dplyr))}
 
+if(suppressWarnings(suppressMessages(!require(parallel))))
+{install.packages("parallel", dependencies = T, repos='https://cloud.r-project.org/')
+  suppressMessages(require(parallel))}
+
 #if(suppressWarnings(suppressMessages(!require(ShortRead))))
 #{source("http://www.bioconductor.org/biocLite.R")
 #  biocLite("ShortRead", suppressUpdates = T)
