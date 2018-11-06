@@ -96,15 +96,15 @@ close(fqF, fqR)
 ######### trim variable Ns before barcode ########
 #### fqgrep primer sequence on R1 and R2 reads allowing mismatches and generate report ####
 # R1
-R1_fw_fq<-paste("fqgrep -c -e -r -p ", "'", fw_primer, "' -m ", primer_mismatch, " ", R1_path, ">", paste(temp_dir, "FW_R1_report.txt", sep=""), sep="")
+R1_fw_fq<-paste("fqgrep -c -e -r -p ", "'", fw_primer, "' -m ", primer_mismatch_fw, " ", R1_path, ">", paste(temp_dir, "FW_R1_report.txt", sep=""), sep="")
 # R2
-R2_rev_fq<-paste("fqgrep -c -e -r -p ", "'", rev_primer, "' -m ", primer_mismatch, " ", R2_path, ">", paste(temp_dir, "REV_R2_report.txt", sep=""), sep="")
+R2_rev_fq<-paste("fqgrep -c -e -r -p ", "'", rev_primer, "' -m ", primer_mismatch_rev, " ", R2_path, ">", paste(temp_dir, "REV_R2_report.txt", sep=""), sep="")
 
 #### fqgrep primer sequence on R1 and R2 reads inverting FW and REV ####
 # R2
-R2_fw_fq<-paste("fqgrep -c -e -r -p ", "'", fw_primer, "' -m ", primer_mismatch, " ", R2_path, ">", paste(temp_dir, "FW_R2_report.txt", sep=""), sep="")
+R2_fw_fq<-paste("fqgrep -c -e -r -p ", "'", fw_primer, "' -m ", primer_mismatch_fw, " ", R2_path, ">", paste(temp_dir, "FW_R2_report.txt", sep=""), sep="")
 # R1
-R1_rev_fq<-paste("fqgrep -c -e -r -p ", "'", rev_primer, "' -m ", primer_mismatch, " ", R1_path, ">", paste(temp_dir, "REV_R1_report.txt", sep=""), sep="")
+R1_rev_fq<-paste("fqgrep -c -e -r -p ", "'", rev_primer, "' -m ", primer_mismatch_rev, " ", R1_path, ">", paste(temp_dir, "REV_R1_report.txt", sep=""), sep="")
 
 # generate reports with multicore fqgrep commands
 mc_fqgrep<-mclapply(list(R1_fw_fq, R2_rev_fq, R2_fw_fq, R1_rev_fq), function(list) system(list), mc.cores=nthreads, mc.preschedule=T, mc.cleanup=T)
