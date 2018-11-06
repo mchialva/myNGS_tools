@@ -120,6 +120,7 @@ R2_fw_fq<-paste("fqgrep -c -e -r -p ", "'", fw_primer, "' -m ", primer_mismatch_
 R1_rev_fq<-paste("fqgrep -c -e -r -p ", "'", rev_primer, "' -m ", primer_mismatch_rev, " ", R1_path, ">", paste(temp_dir, "REV_R1_report.txt", sep=""), sep="")
 
 # generate reports with multicore fqgrep commands
+message("Matching primers...")
 mc_fqgrep<-mclapply(list(R1_fw_fq, R2_rev_fq, R2_fw_fq, R1_rev_fq), function(list) system(list), mc.cores=nthreads, mc.preschedule=T, mc.cleanup=T)
 
 # import report files
@@ -144,10 +145,12 @@ trim_Ns<-function(x) {
 }
 
 # Launch trimming command
+message("Trimming...")                        
 trimmed_list<-mclapply(reports_list, function(x)
   trim_Ns(x), mc.cores=nthreads, mc.preschedule=T, mc.cleanup=T)
 
 # merge FW and REV
+message("Coupling R1 with R2...")                       
 FW_REV_R1<-merge(trimmed_list[[1]], trimmed_list[[4]], by="read.name")
 FW_REV_R1[1]<-paste(FW_REV_R1$read.name,FW_REV_R1$read.comments.x, sep=" ")
 FW_REV_R1[28]<-paste(substr(FW_REV_R1$read.name, 1, str_length(FW_REV_R1$read.name)-str_length(FW_REV_R1$read.comments.x)),FW_REV_R1$read.comments.y, sep="")
@@ -180,6 +183,7 @@ R2<-rbind(
   )
 
 # Write Output
+message("Writing output files...")
 if(output_extension=="fastq"){
 # Write re-oriented trimmed as .fastq
 write.table(R1, file=paste(output_dir, str_replace(basename(R1_path), ".fastq", "_trimmed.fastq"), sep=""), row.names = FALSE, col.names = FALSE, quote = FALSE)
