@@ -67,30 +67,39 @@ if(suppressWarnings(suppressMessages(!require(ShortRead))))
 message("The script actually runs with a maximum at 4 cores:")
 message("Multithreading enabled on ", ifelse(nthreads>4,4, nthreads), " cores")
 
-# Check format
+# Check format and number of reads
 if(all(str_split_fixed(R1_path, pattern="\\.", 2)[,2]=="fastq" && str_split_fixed(R2_path, pattern="\\.", 2)[,2] == "fastq")){
   message("fastq reads detected\n", "R1: ", R1_path, "\nR2: ", R2_path, "\noutput set to .fastq")
   output_extension<-"fastq"
+  fqF<-system(paste("echo $(cat ", R1_path, "|wc -l)/4|bc", paste=""), intern=T)
+  fqR<-system(paste("echo $(cat ", R2_path, "|wc -l)/4|bc", paste=""), intern=T)
 } else{
   if(all(str_split_fixed(R1_path, pattern="\\.", 2)[,2]=="fastq.gz" && str_split_fixed(R2_path, pattern="\\.", 2)[,2] == "fastq.gz")){
     message("fastq.gz reads detected\n", "R1: ", R1_path, "\nR2: ", R2_path, "\noutput set to .fastq.gz")
     output_extension<-"gz"
+    fqF<-system(paste("echo $(zcat ", R1_path, "|wc -l)/4|bc", paste=""), intern=T)
+    fqR<-system(paste("echo $(zcat ", R2_path, "|wc -l)/4|bc", paste=""), intern=T)
   } else{
     errQuit("input read files extension unknown")}
   }
 
 # Print number of Reads in input and check if reads in R1 == reads in R2
 # Stream on input .fastq files
-fqF <- FastqStreamer(R1_path, 1e6)
-fqR <- FastqStreamer(R2_path, 1e6)
+#fqF <- FastqStreamer(R1_path, 1e6)
+#fqR <- FastqStreamer(R2_path, 1e6)
 
 # Check length
-if((R1<-length(yield(fqF))) != (R2<-length(yield(fqR)))) {
+#if((R1<-length(yield(fqF))) != (R2<-length(yield(fqR)))) {
+#  errQuit("R1 and R2 contain a different number of reads")
+#} else {
+#  message("Reads in input\n", "R1: ", R1, "\nR2: ", R2)
+#}
+#close(fqF, fqR)
+if(fqF != fqR) {
   errQuit("R1 and R2 contain a different number of reads")
-} else {
-  message("Reads in input\n", "R1: ", R1, "\nR2: ", R2)
-}
-close(fqF, fqR)
+  } else {
+    message("Reads in input\n", "R1: ", fqF, "\nR2: ", fqR)
+  }
 
 ######### Re-orient paired-end reads and  ########
 ######### trim variable Ns before barcode ########
@@ -171,6 +180,8 @@ if(output_extension=="fastq"){
 # Write re-oriented trimmed as .fastq
 write.table(R1, file=paste(output_dir, str_replace(basename(R1_path), ".fastq", "_trimmed.fastq"), sep=""), row.names = FALSE, col.names = FALSE, quote = FALSE)
 write.table(R2, file=paste(output_dir, str_replace(basename(R2_path), ".fastq", "_trimmed.fastq"), sep=""), row.names = FALSE, col.names = FALSE, quote = FALSE)
+fqF_o<-system(paste("echo $(cat ", paste(output_dir, str_replace(basename(R1_path), ".fastq", "_trimmed.fastq"), sep=""), "|wc -l)/4|bc", paste=""), intern=T)
+fqR_o<-system(paste("echo $(cat ", paste(output_dir, str_replace(basename(R2_path), ".fastq", "_trimmed.fastq"), sep=""), "|wc -l)/4|bc", paste=""), intern=T)
 } else {
 # Write re-oriented trimmed as .fastq.gz files
 gz1 = gzfile(paste(output_dir, str_replace(basename(R1_path), ".fastq.gz", "_trimmed.fastq.gz"), sep=""),"w")
@@ -180,18 +191,29 @@ close(gz1)
 gz2 = gzfile(paste(output_dir, str_replace(basename(R2_path), ".fastq.gz", "_trimmed.fastq.gz"), sep=""),"w")
 write(R2, gz2)
 close(gz2)
+fqF_o<-system(paste("echo $(zcat ", paste(output_dir, str_replace(basename(R1_path), ".fastq", "_trimmed.fastq"), sep=""), "|wc -l)/4|bc", paste=""), intern=T)
+fqR_o<-system(paste("echo $(zcat ", paste(output_dir, str_replace(basename(R2_path), ".fastq", "_trimmed.fastq"), sep=""), "|wc -l)/4|bc", paste=""), intern=T)
 }
-          
-# Print number of Reads in outputs and check if reads in R1 == reads in R2
-fqF_o <- FastqStreamer(paste(output_dir, str_replace(basename(R1_path), ".fastq", "_trimmed.fastq"), sep=""), 1e6)
-fqR_o <- FastqStreamer(paste(output_dir, str_replace(basename(R2_path), ".fastq", "_trimmed.fastq"), sep=""), 1e6)
 
-if((R1<-length(yield(fqF_o))) != (R2<-length(yield(fqR_o)))) {
-  errQuit("An error occurred, R1/R2 output contain a different number of reads")
+# Print number of Reads in outputs and check if reads in R1 == reads in R2
+#fqF_o <- FastqStreamer(paste(output_dir, str_replace(basename(R1_path), ".fastq", "_trimmed.fastq"), sep=""), 1e6)
+#fqR_o <- FastqStreamer(paste(output_dir, str_replace(basename(R2_path), ".fastq", "_trimmed.fastq"), sep=""), 1e6)
+
+#if((R1<-length(yield(fqF_o))) != (R2<-length(yield(fqR_o)))) {
+#  errQuit("An error occurred, R1/R2 output contain a different number of reads")
+#} else {
+#  message("Reads in output\n", "R1: ", R1, "\nR2: ", R2)
+#}
+#close(fqF_o, fqR_o)
+
+#fqF_o<-system(paste("echo $(zcat ", paste(output_dir, str_replace(basename(R1_path), ".fastq", "_trimmed.fastq"), sep=""), "|wc -l)/4|bc", paste=""))
+#fqR_o<-system(paste("echo $(zcat ", paste(output_dir, str_replace(basename(R2_path), ".fastq", "_trimmed.fastq"), sep=""), "|wc -l)/4|bc", paste=""))
+
+if(fqF_o != fqR_o) {
+  errQuit("An error occurred, R1 and R2 output contain a different number of reads")
 } else {
-  message("Reads in output\n", "R1: ", R1, "\nR2: ", R2)
+  message("Reads in output\n", "R1: ", fqF_o, "\nR2: ", fqR_o)
 }
-close(fqF_o, fqR_o)
 
 stop.time<-proc.time()
 message("Elapsed time (min):")
