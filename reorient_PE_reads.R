@@ -7,10 +7,11 @@ R1_path<-args[[1]]
 R2_path<-args[[2]]
 fw_primer<-args[[3]]
 rev_primer<-args[[4]]
-primer_mismatch<-as.integer(args[[5]])
-output_dir<-args[[6]]
-barcode_length<-as.integer(args[[7]])
-nthreads<-as.integer(args[[8]])
+primer_mismatch_fw<-as.integer(args[[5]])
+primer_mismatch_rev<-as.integer(args[[6]])
+output_dir<-args[[7]]
+barcode_length<-as.integer(args[[8]])
+nthreads<-as.integer(args[[9]])
 
 errQuit <- function(mesg, status=1) {
   message("Error: ", mesg)
@@ -65,6 +66,18 @@ if(suppressWarnings(suppressMessages(!require(ShortRead))))
 #### Display Multithreading Warning #### 
 message("The script actually runs with a maximum at 4 cores:")
 message("Multithreading enabled on ", ifelse(nthreads>4,4, nthreads), " cores")
+
+# Check format
+if(all(str_split_fixed(R1_path, pattern="\\.", 2)[,2]=="fastq" && str_split_fixed(R2_path, pattern="\\.", 2)[,2] == "fastq")){
+  message("fastq reads detected\n", "R1: ", R1_path, "\nR2: ", R2_path, "\noutput set to .fastq")
+  output_extension<-"fastq"
+} else{
+  if(all(str_split_fixed(R1_path, pattern="\\.", 2)[,2]=="fastq.gz" && str_split_fixed(R2_path, pattern="\\.", 2)[,2] == "fastq.gz")){
+    message("fastq.gz reads detected\n", "R1: ", R1_path, "\nR2: ", R2_path, "\noutput set to .fastq.gz")
+    output_extension<-"gz"
+  } else{
+    errQuit("input read files extension unknown")}
+  }
 
 # Print number of Reads in input and check if reads in R1 == reads in R2
 # Stream on input .fastq files
@@ -153,10 +166,22 @@ R2<-rbind(
   do.call(rbind, lapply(seq(nrow(FW_REV_R2[,c(28,23,29,24)])), function(i) t(FW_REV_R2[,c(28,23,29,24)][i, ])))
   )
 
-# Write re-oriented trimmed .fastq files
+# Write Output
+if(output_extension=="fastq"){
+# Write re-oriented trimmed as .fastq
 write.table(R1, file=paste(output_dir, str_replace(basename(R1_path), ".fastq", "_trimmed.fastq"), sep=""), row.names = FALSE, col.names = FALSE, quote = FALSE)
 write.table(R2, file=paste(output_dir, str_replace(basename(R2_path), ".fastq", "_trimmed.fastq"), sep=""), row.names = FALSE, col.names = FALSE, quote = FALSE)
+} else {
+# Write re-oriented trimmed as .fastq.gz files
+gz1 = gzfile(paste(output_dir, str_replace(basename(R1_path), ".fastq.gz", "_trimmed.fastq.gz"), sep=""),"w")
+write(R1, gz1)
+close(gz1)
 
+gz2 = gzfile(paste(output_dir, str_replace(basename(R2_path), ".fastq.gz", "_trimmed.fastq.gz"), sep=""),"w")
+write(R2, gz2)
+close(gz2)
+}
+          
 # Print number of Reads in outputs and check if reads in R1 == reads in R2
 fqF_o <- FastqStreamer(paste(output_dir, str_replace(basename(R1_path), ".fastq", "_trimmed.fastq"), sep=""), 1e6)
 fqR_o <- FastqStreamer(paste(output_dir, str_replace(basename(R2_path), ".fastq", "_trimmed.fastq"), sep=""), 1e6)
