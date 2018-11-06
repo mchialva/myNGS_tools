@@ -58,13 +58,13 @@ if(suppressWarnings(suppressMessages(!require(dplyr))))
 {install.packages("dplyr", dependencies = T, repos='https://cloud.r-project.org/')
   suppressMessages(require(dplyr))}
 
-if(suppressWarnings(suppressMessages(!require(ShortRead))))
-{source("http://www.bioconductor.org/biocLite.R")
-  biocLite("ShortRead", suppressUpdates = T)
-  suppressMessages(require(ShortRead))}
+#if(suppressWarnings(suppressMessages(!require(ShortRead))))
+#{source("http://www.bioconductor.org/biocLite.R")
+#  biocLite("ShortRead", suppressUpdates = T)
+#  suppressMessages(require(ShortRead))}
 
 #### Display Multithreading Warning #### 
-message("The script actually runs with a maximum at 4 cores:")
+message("The script runs at maximum 4 cores:")
 message("Multithreading enabled on ", ifelse(nthreads>4,4, nthreads), " cores")
 
 # Check format and number of reads
