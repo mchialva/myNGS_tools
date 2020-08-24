@@ -126,6 +126,7 @@ mc_fqgrep<-mclapply(list(R1_fw_fq, R2_rev_fq, R2_fw_fq, R1_rev_fq), function(lis
 # check report files dimension
 report_dim<-unlist(lapply(list.files("/home/matteo/Scrivania/Work_on_Server/Olivo/Trimmed/temp/", full.names = T), function(x) file.size(x)))
 if(sum(report_dim[2],report_dim[3])==0){
+  unlink(file.path(output_dir), recursive = T)
   errQuit("Reads are already in correct orientation")
 }
 # import report files
