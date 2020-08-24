@@ -123,6 +123,11 @@ R1_rev_fq<-paste("fqgrep -c -e -r -p ", "'", rev_primer, "' -m ", primer_mismatc
 message("Matching primers...")
 mc_fqgrep<-mclapply(list(R1_fw_fq, R2_rev_fq, R2_fw_fq, R1_rev_fq), function(list) system(list), mc.cores=nthreads, mc.preschedule=T, mc.cleanup=T)
 
+# check report files dimension
+report_dim<-unlist(lapply(list.files("/home/matteo/Scrivania/Work_on_Server/Olivo/Trimmed/temp/", full.names = T), function(x) file.size(x)))
+if(sum(report_dim[2],report_dim[3])==0){
+  errQuit("Reads are already in correct orientation")
+}
 # import report files
 reports_list<- mclapply(list.files(temp_dir, full.names=T), function(x) read.delim(x, header=T), mc.cores=nthreads, mc.preschedule=T, mc.cleanup=T)
 
