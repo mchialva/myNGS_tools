@@ -2,9 +2,9 @@
 # to be uses only with significantly enriched GO categories
 # geneID colnames must be "id"
 
-add_genes2GO<-function(GO, gene2cat, DE_genes, sep){
+add_genes2GO<-function(GO, gene2cat, DE_genes, sep=",", colID="id){
   require(stringi)
-  gene2cat_DE<-gene2cat[gene2cat[,1]%in%DE_genes$id,]
+  gene2cat_DE<-gene2cat[gene2cat[,1]%in%DE_genes[,colID],]
   Genes<-unlist(lapply(GO$category, function(x) stri_paste(gene2cat_DE[gene2cat_DE[,2]==x,][,1], collapse = sep)))
   #genes_list<-stri_paste(gene2cat[gene2cat[,2]==GO,][,1], collapse = sep)
   data<-cbind(GO, Genes)
