@@ -20,7 +20,7 @@ add_GO2genes<-function(DE_genes, gene2cat, sep=",", cat.name="GO_annotation", co
   #data<-cbind(DE_genes, GO)
   colnames(GO)[2]<-cat.name
   data<-merge(DE_genes, GO, by.x=colID, by.y=1,  all.x=T)
-  data<-data %>% relocate(all_of(colID), .before = all_of(cat.name))
+  #data<-data %>% relocate(all_of(colID), .before = all_of(cat.name))
   return(data)
 }
 
