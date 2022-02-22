@@ -1,13 +1,26 @@
 # add gene ID to GO enrichment table (GOseq)
 # to be uses only with significantly enriched GO categories
-# geneID colnames must be "id"
 
-add_genes2GO<-function(GO, gene2cat, DE_genes, sep=",", colID="id){
+add_genes2GO<-function(GO, gene2cat, DE_genes, sep=",", colID="id"){
   require(stringi)
   gene2cat_DE<-gene2cat[gene2cat[,1]%in%DE_genes[,colID],]
   Genes<-unlist(lapply(GO$category, function(x) stri_paste(gene2cat_DE[gene2cat_DE[,2]==x,][,1], collapse = sep)))
   #genes_list<-stri_paste(gene2cat[gene2cat[,2]==GO,][,1], collapse = sep)
   data<-cbind(GO, Genes)
+  return(data)
+}
+
+# add GO category to DEG table
+# use all mapped categories
+add_GO2genes<-function(DE_genes, gene2cat, sep=",", cat.name="GO_annotation", colID="id"){
+  require(stringi, dplyr)
+  gene2cat_DE<-gene2cat[gene2cat[,1]%in%DE_genes[,colID],]
+  GO<-str_split_fixed(unlist(lapply(DE_genes[,colID], function(x) paste(x, stri_paste(gene2cat_DE[gene2cat_DE[,1]==x,][,2], collapse = sep), sep="/tx"))), pattern = "/tx", n=2)
+  #genes_list<-stri_paste(gene2cat[gene2cat[,2]==GO,][,1], collapse = sep)
+  #data<-cbind(DE_genes, GO)
+  colnames(GO)[2]<-cat.name
+  data<-merge(DE_genes, GO, by.x=colID, by.y=1,  all.x=T)
+  data<-data %>% relocate(all_of(colID), .before = all_of(cat.name))
   return(data)
 }
 
