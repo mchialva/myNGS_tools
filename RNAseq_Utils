@@ -134,4 +134,14 @@ GOCircleR<-function (data, title, nsub, rad1, rad2, table.legend = T, zsc.col,
                 panel.background = element_rect(colour="white", fill = "white"))
     }
 }
+#### Convert in DAVID format to add z-scores and 'GOplot' compatibility ####
+goseq2david<-function(goseq_df){
+  data<-goseq_df[, c(1,6,7,8,9)]
+  colnames(data)<-c("ID", "Term", "Category", "adj_pval", "Genes")
+  return(data)
+}
 
+deseq2david<-function(deseq_df, logFC_col, colID="id"){
+  data<-data.frame(ID=deseq_df[,colID], logFC=deseq_df[, logFC_col])
+  return(data)
+}
