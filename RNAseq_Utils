@@ -145,3 +145,9 @@ deseq2david<-function(deseq_df, logFC_col, colID="id"){
   data<-data.frame(ID=deseq_df[,colID], logFC=deseq_df[, logFC_col])
   return(data)
 }
+
+gglegend <- function(x){ 
+  tmp <- ggplot_gtable(ggplot_build(x)) 
+  leg <- which(sapply(tmp$grobs, function(y) y$name) == "guide-box") 
+  tmp$grobs[[leg]]
+}
