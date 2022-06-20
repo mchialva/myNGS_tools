@@ -146,6 +146,7 @@ deseq2david<-function(deseq_df, logFC_col, colID="id"){
   return(data)
 }
 
+# plot only legend from any ggplot2 plot (credits: from https://stackoverflow.com/questions/12539348/ggplot-separate-legend-and-plot)
 gglegend <- function(x){ 
   tmp <- ggplot_gtable(ggplot_build(x)) 
   leg <- which(sapply(tmp$grobs, function(y) y$name) == "guide-box") 
