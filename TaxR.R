@@ -26,7 +26,7 @@ tax_level<-function(counts, rank, samples_column, show_parent=F) {
 }
 
 ### Traspose, order for reads number and select N top-taxa and add the "Other" category. taxa as row & samples as column table as input
-reduce_taxa<-function(df, N) {
+reduce_taxa<-function(df, N, method="sum", keep_rownames=F) {
   require(reshape2)
   df_t<-t(df)
   {
