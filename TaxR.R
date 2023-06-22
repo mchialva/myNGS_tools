@@ -15,7 +15,10 @@ filter_reads<- function(data, min.sample, min.reads) {
 }
 
 ### Cut counts table at given taxonomic rank (sum reads below given level)
-LCA_level<-function(counts, rank, samples_column) {
+tax_level<-function(counts, rank, samples_column, show_parent=F) {
+  if (show_parent==F)
+    counts=counts
+  else counts[,rank]<-paste(counts[,which(colnames(counts)==rank )], " (", counts[,which(colnames(counts)==rank )-1], ")", sep="")
   filtered<-data.frame(lapply(counts[,samples_column],
                               function(x) tapply(x, counts[,rank], sum, na.rm=TRUE)))
   filtered<-filtered[rowSums(is.na(filtered)) != ncol(filtered),]
@@ -26,8 +29,16 @@ LCA_level<-function(counts, rank, samples_column) {
 reduce_taxa<-function(df, N) {
   require(reshape2)
   df_t<-t(df)
+  {
+  if (method=="sum")
   df_t_ord<-df_t[,order(colSums(df_t), decreasing=TRUE)]
+  if (method=="mean")
+  df_t_ord<-df_t[,order(colMeans(df_t), decreasing=TRUE)]
+  }
   taxa_list<-colnames(df_t_ord)[1:N]
   df_reduced<-data.frame(df_t_ord[,colnames(df_t_ord) %in% taxa_list], Others=rowSums(df_t_ord[,!colnames(df_t_ord) %in% taxa_list], na.rm = T))
+  if (keep_rownames==F) 
+   return(df_reduced)
+  else colnames(df_reduced)[1:N]<-colnames(df_t_ord)[1:N]
   return(df_reduced)
 }
